@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://justice.gov.uk/systemid/mapper/systemid-map-list.json",
+  "type": "object",
+  "properties": {
+    "systemIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "http://justice.gov.uk/systemid/mapper/systemid.json"
+      }
+    }
+  },
+  "additionalProperties": false
+}

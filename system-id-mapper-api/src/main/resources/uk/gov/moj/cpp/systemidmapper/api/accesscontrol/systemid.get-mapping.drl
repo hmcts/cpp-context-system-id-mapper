@@ -1,0 +1,55 @@
+package uk.gov.moj.cpp.systemidmapper.api.accesscontrol;
+
+import uk.gov.moj.cpp.accesscontrol.drools.Outcome;
+import uk.gov.moj.cpp.accesscontrol.drools.Action;
+
+global uk.gov.moj.cpp.accesscontrol.common.providers.UserAndGroupProvider userAndGroupProvider;
+
+rule "Command - Rule to restrict GetMapping to System users only"
+  when
+    $outcome: Outcome();
+    $action: Action(name == "systemid.get-mapping");
+    eval(userAndGroupProvider.isSystemUser($action));
+  then
+    $outcome.setSuccess(true);
+end
+
+rule "Command - Rule to restrict creating a mapping to System users only"
+  when
+    $outcome: Outcome();
+    $action: Action(name == "systemid.map");
+    eval(userAndGroupProvider.isSystemUser($action));
+  then
+    $outcome.setSuccess(true);
+end
+
+rule "Command - Rule to restrict finding a mapping to System users only"
+  when
+    $outcome: Outcome();
+    $action: Action(name == "systemid.find-mapping");
+    eval(userAndGroupProvider.isSystemUser($action));
+  then
+    $outcome.setSuccess(true);
+end
+
+rule "Command - Rule to restrict remapping a mapping to System users only"
+  when
+    $outcome: Outcome();
+    $action: Action(name == "systemid.remap");
+    eval(userAndGroupProvider.isSystemUser($action));
+  then
+    $outcome.setSuccess(true);
+end
+
+rule "Command - Rule to restrict creating bulk mappings to System users only"
+  when
+    $outcome: Outcome();
+    $action: Action(name == "systemid.map.list");
+    eval(userAndGroupProvider.isSystemUser($action));
+  then
+    $outcome.setSuccess(true);
+end
+
+
+
+

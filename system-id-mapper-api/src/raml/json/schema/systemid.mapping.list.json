@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://justice.gov.uk/systemid/mapper/systemid-mapping-list.json",
+  "type": "object",
+  "properties": {
+    "systemIdMappings": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "mappingId": {
+              "$ref": "#/definitions/uuid"
+            },
+            "sourceId": {
+              "type": "string"
+            },
+            "targetId": {
+              "$ref": "#/definitions/uuid"
+            },
+            "isError": {
+              "type": "boolean"
+            },
+            "error": {
+              "type": "string"
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "mappingId",
+                "sourceId",
+                "targetId",
+                "isError"
+              ]
+            },
+            {
+              "required": [
+                "sourceId",
+                "targetId",
+                "isError",
+                "error"
+              ]
+            }
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "mappingId": {
+      "$ref": "#/definitions/uuid"
+    },
+    "sourceId": {
+      "type": "string"
+    },
+    "sourceType": {
+      "type": "string"
+    },
+    "targetId": {
+      "$ref": "#/definitions/uuid"
+    },
+    "targetType": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "mappingId",
+    "sourceId",
+    "sourceType",
+    "targetId",
+    "targetType",
+    "createdAt"
+  ],
+  "definitions": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    }
+  }
+}

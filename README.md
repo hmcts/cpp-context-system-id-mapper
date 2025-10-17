@@ -1,1 +1,0 @@
-# cpp-context-system-id-mapper

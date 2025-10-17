@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://justice.gov.uk/systemid/mapper/systemid.json",
+  "type": "object",
+  "properties": {
+    "sourceId": {
+      "type": "string"
+    },
+    "sourceType": {
+      "type": "string"
+    },
+    "targetId": {
+      "$ref": "#/definitions/uuid"
+    },
+    "targetType": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "sourceId",
+    "sourceType",
+    "targetId",
+    "targetType"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    }
+  }
+}

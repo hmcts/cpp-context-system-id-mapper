@@ -1,0 +1,29 @@
+ARG baseImageUri
+ARG baseImageTag
+FROM ${baseImageUri}:${baseImageTag}
+
+ARG version
+ARG mavenArtifactBaseUrl
+
+ARG framework_version
+ARG eventstore_version
+
+ARG wildfly_home=/opt/jboss/wildfly
+ARG wildfly_user=jboss
+ARG context_group_name=system-id-mapper
+ARG context_name=system-id-mapper
+
+# service war file
+ADD ${mavenArtifactBaseUrl}/uk/gov/moj/cpp/${context_group_name}/${context_name}-api/${version}/${context_name}-api-${version}.war ${wildfly_home}/standalone/deployments/
+USER root
+RUN chown ${wildfly_user}:${wildfly_user} ${wildfly_home}/standalone/deployments/${context_name}-api-${version}.war
+
+# liquibase jars & config
+RUN mkdir /tmp/liquibase
+ADD ${mavenArtifactBaseUrl}/uk/gov/moj/cpp/${context_group_name}/${context_name}-liquibase/${version}/${context_name}-liquibase-${version}.jar /tmp/liquibase/${context_name}-liquibase.jar
+RUN chmod -R 755 /tmp/liquibase
+COPY scripts/liquibase.sh /tmp/liquibase/liquibase.sh
+RUN chown ${wildfly_user}:${wildfly_user} /tmp/liquibase/liquibase.sh && chmod 755 /tmp/liquibase/liquibase.sh
+RUN mkdir /opt/cpp-tools
+USER ${wildfly_user}
+LABEL base_image ${baseImageTag}
