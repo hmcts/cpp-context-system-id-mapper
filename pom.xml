@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>uk.gov.moj.cpp.common</groupId>
+        <artifactId>service-parent-pom</artifactId>
+        <version>17.103.3</version>
+    </parent>
+
+    <groupId>uk.gov.moj.cpp.system-id-mapper</groupId>
+    <artifactId>system-id-mapper-parent</artifactId>
+    <version>17.0.22-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>System ID Mapper Service - Parent Module</name>
+
+    <properties>
+        <sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec
+        </sonar.jacoco.itReportPath>
+        <sonar.report.export.path>sonar-report.json</sonar.report.export.path>
+        <sonar.scm.provider>git</sonar.scm.provider>
+        <jgitflow.maven.developBranchName>main</jgitflow.maven.developBranchName>
+    </properties>
+
+    <modules>
+        <module>system-id-mapper-api</module>
+        <module>system-id-mapper-integration-test</module>
+        <module>system-id-mapper-persistence</module>
+        <module>system-id-mapper-service</module>
+        <module>system-id-mapper-healthchecks</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>true</archiveClasses>
+                    <attachClasses>true</attachClasses>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

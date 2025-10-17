@@ -1,0 +1,92 @@
+#%RAML 0.8
+title: System ID Mapping API
+baseUri: http://localhost:8080/system-id-mapper-api/rest/systemid
+mediaType: application/json
+protocols: [ HTTP, HTTPS ]
+
+/mappings/:
+  description: |
+    Manage System ID Mapping
+  post:
+    description: |
+        ...
+        (mapping):
+            requestType: application/vnd.systemid.map+json
+            name: systemid.map
+        (mapping):
+            requestType: application/vnd.systemid.remap+json
+            name: systemid.remap
+        (mapping):
+             requestType: application/vnd.systemid.map.list+json
+             name: systemid.map.list
+        ...
+
+    body:
+        application/vnd.systemid.map+json:
+            schema: !include json/schema/systemid.map.json
+            example: !include json/systemid.map.json
+        application/vnd.systemid.remap+json:
+            schema: !include json/schema/systemid.remap.json
+            example: !include json/systemid.remap.json
+        application/vnd.systemid.map.list+json:
+            schema: !include json/schema/systemid.map.list.json
+            example: !include json/systemid.map.list.json
+
+    responses:
+      200:
+        body:
+          application/vnd.systemid.mapping.id+json:
+            schema: !include json/schema/systemid.mapping.id.json
+            example: !include json/systemid.mapping.id.json
+          application/vnd.systemid.mapping.list+json:
+            schema: !include json/schema/systemid.mapping.list.json
+            example: !include json/systemid.mapping.list.json
+      409:
+        body:
+          application/vnd.systemid.mapping.conflict+json:
+            schema: !include json/schema/systemid.mapping.conflict.json
+            example: !include json/systemid.mapping.conflict.json
+
+  get:
+    description: |
+        Query via either sourceId, sourceType and targetType OR targetId and targetType
+        ...
+        (mapping):
+            responseType: application/vnd.systemid.mapping+json
+            name: systemid.find-mapping
+        ...
+    queryParameters:
+        sourceId:
+            type: string
+            required: false
+        sourceType:
+            type: string
+            required: false
+        targetId:
+            type: string
+            required: false
+        targetType:
+            type: string
+            required: true
+    responses:
+      200:
+        body:
+          application/vnd.systemid.mapping+json:
+            schema: !include json/schema/systemid.mapping.json
+            example: !include json/systemid.mapping.json
+
+/mappings/{mappingId}:
+  description: Get a mapping by its primary key
+  get:
+    description: |
+        ...
+        (mapping):
+            responseType: application/vnd.systemid.mapping+json
+            name: systemid.get-mapping
+        ...
+    responses:
+      200:
+        body:
+          application/vnd.systemid.mapping+json:
+            schema: !include json/schema/systemid.mapping.json
+            example: !include json/systemid.mapping.json

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+    <changeSet id="add-index-to-mapping-table.xml" author="sajanc"
+               logicalFilePath="liquibase/changelog.xml">
+
+        <createIndex tableName="mapping"
+                     indexName="mapping_target_id_idx">
+            <column name="target_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="mapping" indexName="mapping_target_id_idx"/>
+        </rollback>
+
+    </changeSet>
+</databaseChangeLog>
