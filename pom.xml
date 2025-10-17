@@ -10,7 +10,7 @@
 
     <groupId>uk.gov.moj.cpp.system-id-mapper</groupId>
     <artifactId>system-id-mapper-parent</artifactId>
-    <version>17.0.22-SNAPSHOT</version>
+    <version>17.0.23-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>System ID Mapper Service - Parent Module</name>
