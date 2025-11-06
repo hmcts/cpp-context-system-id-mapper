@@ -7,16 +7,16 @@ import static java.util.UUID.randomUUID;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.*;
 
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.api.SystemIdMappingRepository;
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.MappingResponse;
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.SystemIdMapping;
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.exception.MappingConflictException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -133,6 +133,100 @@ public class SystemIdMappingServiceTest {
         final Optional<SystemIdMapping> mapping = systemIdMappingService.findMappingBySourceIdAndTargetType(sourceId, targetType);
 
         assertThat(mapping.get(), is(equalTo(systemIdMapping)));
+    }
+
+    @Test
+    void shouldReturnAllMappingsForCommaSeparatedSourceIds() {
+        final String commaSeparatedSourceIds = "CaseURNID01, CaseURNID02 , CaseURNID03";
+        final String targetType = "CASE-ID";
+        SystemIdMapping systemIdMapping1 = mock(SystemIdMapping.class);
+        SystemIdMapping systemIdMapping2 = mock(SystemIdMapping.class);
+        when(systemIdMappingRepository.findBySourceIdAndTargetType("CaseURNID01", targetType))
+                .thenReturn(Optional.of(systemIdMapping1));
+        when(systemIdMappingRepository.findBySourceIdAndTargetType("CaseURNID02", targetType))
+                .thenReturn(Optional.of(systemIdMapping2));
+        when(systemIdMappingRepository.findBySourceIdAndTargetType("CaseURNID03", targetType))
+                .thenReturn(Optional.empty());
+        List<SystemIdMapping> result =
+                systemIdMappingService.findMappingsBySourceIdsAndTargetType(Optional.of(commaSeparatedSourceIds), targetType);
+        assertEquals(2, result.size());
+        assertSame(systemIdMapping1, result.get(0));
+        assertSame(systemIdMapping2, result.get(1));
+        verify(systemIdMappingRepository, times(1)).findBySourceIdAndTargetType("CaseURNID01", targetType);
+        verify(systemIdMappingRepository, times(1)).findBySourceIdAndTargetType("CaseURNID02", targetType);
+        verify(systemIdMappingRepository, times(1)).findBySourceIdAndTargetType("CaseURNID03", targetType);
+        verifyNoMoreInteractions(systemIdMappingRepository);
+    }
+
+    @Test
+    void shouldIgnoreDuplicateEmptyCommaSeparatedSourceIds() {
+        final String commaSeparatedIds = "CaseURNID01, CaseURNID01 , ";
+        final String targetType = "";
+        SystemIdMapping systemIdMapping = mock(SystemIdMapping.class);
+        when(systemIdMappingRepository.findBySourceIdAndTargetType("CaseURNID01", targetType))
+                .thenReturn(Optional.of(systemIdMapping));
+        List<SystemIdMapping> result =
+                systemIdMappingService.findMappingsBySourceIdsAndTargetType(Optional.of(commaSeparatedIds), targetType);
+        assertEquals(1, result.size());
+        assertSame(systemIdMapping, result.get(0));
+        verify(systemIdMappingRepository, times(1)).findBySourceIdAndTargetType("CaseURNID01", targetType);
+        verifyNoMoreInteractions(systemIdMappingRepository);
+    }
+
+    @Test
+    void shouldReturnNoResultsForBlankSourceIdsAndTargetType() {
+        final String sourceIds = "";
+        final String targetType = "";
+        List<SystemIdMapping> result =
+                systemIdMappingService.findMappingsBySourceIdsAndTargetType(Optional.of(sourceIds), targetType);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void shouldReturnAllMappingsForCommaSeparatedTargetIds() {
+        final String commaSeparatedTargetIds = "066c0ae9-e276-4d29-b669-cb32013228b2, 077c0ae9-e276-4d29-b669-cb32013228b2, 099c0ae9-e276-4d29-b669-cb32013228b2";
+        final String targetType = "CASE-ID";
+        SystemIdMapping systemIdMapping1 = mock(SystemIdMapping.class);
+        SystemIdMapping systemIdMapping2 = mock(SystemIdMapping.class);
+        when(systemIdMappingRepository.findSystemIdMapping(fromString("066c0ae9-e276-4d29-b669-cb32013228b2"), targetType))
+                .thenReturn(Optional.of(systemIdMapping1));
+        when(systemIdMappingRepository.findSystemIdMapping(fromString("077c0ae9-e276-4d29-b669-cb32013228b2"), targetType))
+                .thenReturn(Optional.of(systemIdMapping2));
+        when(systemIdMappingRepository.findSystemIdMapping(fromString("099c0ae9-e276-4d29-b669-cb32013228b2"), targetType))
+                .thenReturn(Optional.empty());
+        List<SystemIdMapping> result =
+                systemIdMappingService.findMappingsByTargetIdsAndTargetType(Optional.of(commaSeparatedTargetIds), targetType);
+        assertEquals(2, result.size());
+        assertSame(systemIdMapping1, result.get(0));
+        assertSame(systemIdMapping2, result.get(1));
+        verify(systemIdMappingRepository, times(1)).findSystemIdMapping(fromString("066c0ae9-e276-4d29-b669-cb32013228b2"), targetType);
+        verify(systemIdMappingRepository, times(1)).findSystemIdMapping(fromString("077c0ae9-e276-4d29-b669-cb32013228b2"), targetType);
+        verify(systemIdMappingRepository, times(1)).findSystemIdMapping(fromString("099c0ae9-e276-4d29-b669-cb32013228b2"), targetType);
+        verifyNoMoreInteractions(systemIdMappingRepository);
+    }
+
+    @Test
+    void shouldIgnoreDuplicateEmptyCommaSeparatedTargetIds() {
+        final String commaSeparatedTargetIds = "066c0ae9-e276-4d29-b669-cb32013228b2, , 066c0ae9-e276-4d29-b669-cb32013228b2";
+        final String targetType = "CASE-ID";
+        SystemIdMapping systemIdMapping = mock(SystemIdMapping.class);
+        when(systemIdMappingRepository.findSystemIdMapping(fromString("066c0ae9-e276-4d29-b669-cb32013228b2"), targetType))
+                .thenReturn(Optional.of(systemIdMapping));
+        List<SystemIdMapping> result =
+                systemIdMappingService.findMappingsByTargetIdsAndTargetType(Optional.of(commaSeparatedTargetIds), targetType);
+        assertEquals(1, result.size());
+        assertSame(systemIdMapping, result.get(0));
+        verify(systemIdMappingRepository, times(1)).findSystemIdMapping(fromString("066c0ae9-e276-4d29-b669-cb32013228b2"), targetType);
+        verifyNoMoreInteractions(systemIdMappingRepository);
+    }
+
+    @Test
+    void shouldReturnNoResultsForBlankTargetIdsAndTargetType() {
+        final String targetIds = "";
+        final String targetType = "";
+        List<SystemIdMapping> result =
+                systemIdMappingService.findMappingsBySourceIdsAndTargetType(Optional.of(targetIds), targetType);
+        assertEquals(0, result.size());
     }
 
     @Test

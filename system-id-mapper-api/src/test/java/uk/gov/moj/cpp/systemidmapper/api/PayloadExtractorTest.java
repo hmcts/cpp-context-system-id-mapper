@@ -106,4 +106,208 @@ public class PayloadExtractorTest {
             assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceId) or (targetType and sourceType) or (targetType and targetId)"));
         }
     }
+
+    @Test
+    public void shouldReturnExtractedPayloadForBulkOperationIfTargetTypeAndSourceIdsArePresent() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "targetType")
+                .add("sourceIds", "source1,source2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        final JsonObject resultPayload = payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+
+        assertThat(resultPayload, is(payload));
+    }
+
+    @Test
+    public void shouldReturnExtractedPayloadForBulkOperationIfTargetTypeAndTargetIdsArePresent() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "targetType")
+                .add("targetIds", "target1,target2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        final JsonObject resultPayload = payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+
+        assertThat(resultPayload, is(payload));
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfBothSourceIdsAndTargetIdsArePresent() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "targetType")
+                .add("sourceIds", "source1,source2")
+                .add("targetIds", "target1,target2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfNeitherSourceIdsNorTargetIdsArePresent() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "targetType")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfTargetTypeIsJsonObject() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", createObjectBuilder().build())
+                .add("sourceIds", "source1,source2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfSourceIdsIsJsonArray() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "targetType")
+                .add("sourceIds", javax.json.Json.createArrayBuilder().add("source1").add("source2").build())
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfTargetIdsIsNull() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "targetType")
+                .addNull("targetIds")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfTargetTypeIsNumber() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", 123)
+                .add("sourceIds", "source1,source2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfTargetTypeIsBoolean() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", true)
+                .add("targetIds", "target1,target2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfTargetTypeIsEmpty() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "")
+                .add("sourceIds", "source1,source2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionForBulkOperationIfTargetTypeIsBlank() {
+
+        final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
+        final JsonObject payload = createObjectBuilder()
+                .add("targetType", "   ")
+                .add("targetIds", "target1,target2")
+                .build();
+
+        when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
+
+        try {
+            payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(jsonEnvelope);
+            fail();
+        } catch (final BadRequestException e) {
+            assertThat(e.getMessage(), is("Bad Request, invalid set of query parameters provided. Please query with either (targetType and sourceIds) or (targetType and targetIds)"));
+        }
+    }
+
 }

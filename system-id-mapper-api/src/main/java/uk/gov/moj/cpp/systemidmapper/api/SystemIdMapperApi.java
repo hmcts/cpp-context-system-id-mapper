@@ -23,10 +23,7 @@ import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.MappingRespon
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.SystemIdMapping;
 import uk.gov.moj.cpp.systemidmapper.service.SystemIdMappingService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.json.JsonObject;
@@ -41,8 +38,10 @@ public class SystemIdMapperApi {
     private static final String ID = "id";
     private static final String MAPPING_ID = "mappingId";
     private static final String SOURCE_ID = "sourceId";
+    private static final String SOURCE_IDS = "sourceIds";
     private static final String SOURCE_TYPE = "sourceType";
     private static final String TARGET_ID = "targetId";
+    private static final String TARGET_IDS = "targetIds";
     private static final String TARGET_TYPE = "targetType";
     private static final String CREATED_AT = "createdAt";
     private static final String COMMA = ",";
@@ -107,6 +106,34 @@ public class SystemIdMapperApi {
             mapping = systemIdMappingService.findMapping(sourceId, sourceType, targetType);
         }
         return envelopeFor(envelope, mapping);
+    }
+
+    @Handles("systemid.find-mappings-bulk")
+    public JsonEnvelope findSystemIdMappingsInBulk(final JsonEnvelope envelope) {
+
+        final JsonObject payload = payloadExtractor.extractPayloadOrThrowBadRequestExceptionForBulkOperation(envelope);
+
+        final String targetType = payload.getString(TARGET_TYPE);
+
+        List<SystemIdMapping> mappings = List.of();
+        if (payload.containsKey(SOURCE_IDS)) {
+            final String sourceIds = payload.getString(SOURCE_IDS);
+            mappings = systemIdMappingService.findMappingsBySourceIdsAndTargetType(Optional.ofNullable(sourceIds), targetType);
+        } else if (payload.containsKey(TARGET_IDS)) {
+            final String targetIds = payload.getString(TARGET_IDS);
+            mappings = systemIdMappingService.findMappingsByTargetIdsAndTargetType(Optional.ofNullable(targetIds), targetType);
+        }
+
+        return envelopeForBulk(envelope, mappings);
+    }
+
+    private JsonEnvelope envelopeForBulk(final JsonEnvelope originalEnvelope, final List<SystemIdMapping> mappings) {
+        final List<JsonObject> jsonObjects = mappings.stream()
+                .map(this::payloadFrom)
+                .toList();
+        final Map<String, List<JsonObject>> map = new HashMap<>();
+        map.put("systemIds", jsonObjects);
+        return enveloper.withMetadataFrom(originalEnvelope, "systemid.mapping").apply(map);
     }
 
     @Handles("systemid.remap")
