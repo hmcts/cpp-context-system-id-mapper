@@ -107,4 +107,13 @@ public class GetMappingAccessControlTest extends BaseDroolsAccessControlTest {
 
         assertFailureOutcome(executeRulesWith(action));
     }
+
+    @Test
+    public void shouldNotAllowUnauthorisedUserToCreateBulkMappings() {
+
+        action = createActionFor("systemid.find-mappings-bulk");
+        when(userAndGroupProvider.isSystemUser(action)).thenReturn(false);
+
+        assertFailureOutcome(executeRulesWith(action));
+    }
 }
