@@ -50,6 +50,15 @@ rule "Command - Rule to restrict creating bulk mappings to System users only"
     $outcome.setSuccess(true);
 end
 
+rule "Command - Rule to restrict find bulk mappings to System users only"
+  when
+    $outcome: Outcome();
+    $action: Action(name == "systemid.find-mappings-bulk");
+    eval(userAndGroupProvider.isSystemUser($action));
+  then
+    $outcome.setSuccess(true);
+end
+
 
 
 
