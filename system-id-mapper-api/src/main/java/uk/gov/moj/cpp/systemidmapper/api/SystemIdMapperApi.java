@@ -3,7 +3,6 @@ package uk.gov.moj.cpp.systemidmapper.api;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.UUID.fromString;
-import static javax.json.Json.createObjectBuilder;
 import static uk.gov.justice.services.messaging.Envelope.metadataBuilder;
 import static uk.gov.justice.services.messaging.JsonEnvelope.envelopeFrom;
 
@@ -16,6 +15,7 @@ import uk.gov.justice.services.core.annotation.Handles;
 import uk.gov.justice.services.core.enveloper.Enveloper;
 import uk.gov.justice.services.messaging.Envelope;
 import uk.gov.justice.services.messaging.JsonEnvelope;
+import uk.gov.justice.services.messaging.JsonObjects;
 import uk.gov.justice.systemid.mapper.SystemIdMappings;
 import uk.gov.justice.systemid.mapper.SystemidMapList;
 import uk.gov.justice.systemid.mapper.SystemidMappingList;
@@ -127,13 +127,13 @@ public class SystemIdMapperApi {
     }
 
     private JsonObject payloadFrom(final UUID mappingId) {
-        return createObjectBuilder()
+        return JsonObjects.createObjectBuilder()
                 .add(ID, mappingId.toString())
                 .build();
     }
 
     private JsonObject payloadFrom(final SystemIdMapping mapping) {
-        return createObjectBuilder()
+        return JsonObjects.createObjectBuilder()
                 .add(MAPPING_ID, mapping.getId().toString())
                 .add(SOURCE_ID, mapping.getSourceId())
                 .add(SOURCE_TYPE, mapping.getSourceType())
