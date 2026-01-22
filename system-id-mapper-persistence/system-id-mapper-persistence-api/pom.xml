@@ -5,7 +5,7 @@
     <parent>
         <groupId>uk.gov.moj.cpp.system-id-mapper</groupId>
         <artifactId>system-id-mapper-persistence</artifactId>
-        <version>17.0.23-CCPAP-482-SNAPSHOT</version>
+        <version>17.0.24-CCPAP-482-SNAPSHOT</version>
     </parent>
 
     <artifactId>system-id-mapper-persistence-api</artifactId>
