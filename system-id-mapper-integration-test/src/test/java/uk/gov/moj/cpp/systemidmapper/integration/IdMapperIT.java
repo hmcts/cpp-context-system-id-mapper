@@ -4,7 +4,6 @@ import static com.jayway.jsonassert.JsonAssert.with;
 import static java.lang.String.format;
 import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
-import static javax.json.Json.createObjectBuilder;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
@@ -22,6 +21,7 @@ import uk.gov.justice.services.common.converter.JsonObjectToObjectConverter;
 import uk.gov.justice.services.common.converter.StringToJsonObjectConverter;
 import uk.gov.justice.services.common.converter.jackson.ObjectMapperProducer;
 import uk.gov.justice.services.common.http.HeaderConstants;
+import uk.gov.justice.services.messaging.JsonObjects;
 import uk.gov.justice.services.test.utils.core.http.RequestParams;
 import uk.gov.justice.services.test.utils.core.rest.RestClient;
 import uk.gov.justice.systemid.mapper.SystemIdMappings;
@@ -74,7 +74,7 @@ public class IdMapperIT {
         final UUID targetId = randomUUID();
         final String targetType = "CASE ID";
 
-        final String requestPayload = createObjectBuilder()
+        final String requestPayload = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId)
                 .add("sourceType", sourceType)
                 .add("targetId", targetId.toString())
@@ -120,7 +120,7 @@ public class IdMapperIT {
         );
 
         final UUID differentTargetId = randomUUID();
-        final String requestPayload = createObjectBuilder()
+        final String requestPayload = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId)
                 .add("sourceType", sourceType)
                 .add("targetId", differentTargetId.toString())
@@ -316,7 +316,7 @@ public class IdMapperIT {
         final UUID targetId = randomUUID();
         final String targetType = "CASE ID";
 
-        final String insertPayload = createObjectBuilder()
+        final String insertPayload = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId)
                 .add("sourceType", sourceType)
                 .add("targetId", targetId.toString())
@@ -331,7 +331,7 @@ public class IdMapperIT {
 
         // Update the sourceId
         final String newSourceId = "new-source-id";
-        final String remapPayload = createObjectBuilder()
+        final String remapPayload = JsonObjects.createObjectBuilder()
                 .add("newSourceId", newSourceId)
                 .add("mappingId", mappingId)
                 .build().toString();

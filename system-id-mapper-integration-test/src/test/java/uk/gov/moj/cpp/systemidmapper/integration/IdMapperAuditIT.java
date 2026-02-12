@@ -3,7 +3,6 @@ package uk.gov.moj.cpp.systemidmapper.integration;
 import static com.jayway.jsonassert.JsonAssert.with;
 import static java.util.UUID.fromString;
 import static java.util.UUID.randomUUID;
-import static javax.json.Json.createObjectBuilder;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +19,7 @@ import uk.gov.justice.services.common.http.HeaderConstants;
 import uk.gov.justice.services.integrationtest.utils.jms.JmsMessageConsumerClient;
 import uk.gov.justice.services.integrationtest.utils.jms.JmsMessageConsumerClientProvider;
 import uk.gov.justice.services.integrationtest.utils.jms.JmsResourceManagementExtension;
+import uk.gov.justice.services.messaging.JsonObjects;
 import uk.gov.justice.services.test.utils.core.http.RequestParams;
 import uk.gov.justice.services.test.utils.core.rest.RestClient;
 
@@ -67,7 +67,7 @@ class IdMapperAuditIT {
         final UUID targetId = randomUUID();
         final String targetType = "CASE ID";
 
-        final String requestPayload = createObjectBuilder()
+        final String requestPayload = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId)
                 .add("sourceType", sourceType)
                 .add("targetId", targetId.toString())
@@ -101,7 +101,7 @@ class IdMapperAuditIT {
         final UUID targetId = randomUUID();
         final String targetType = "CASE ID";
 
-        final String requestPayload = createObjectBuilder()
+        final String requestPayload = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId)
                 .add("sourceType", sourceType)
                 .add("targetId", targetId.toString())
