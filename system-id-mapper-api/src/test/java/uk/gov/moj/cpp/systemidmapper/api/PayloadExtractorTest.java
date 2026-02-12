@@ -1,6 +1,5 @@
 package uk.gov.moj.cpp.systemidmapper.api;
 
-import static javax.json.Json.createObjectBuilder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.services.messaging.JsonObjects;
 
 @ExtendWith(MockitoExtension.class)
 public class PayloadExtractorTest {
@@ -27,7 +27,7 @@ public class PayloadExtractorTest {
     public void shouldReturnExtractedPayloadIfTargetTypeAndSourceIdArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("sourceId", "sourceId")
                 .build();
@@ -43,7 +43,7 @@ public class PayloadExtractorTest {
     public void shouldReturnExtractedPayloadIfTargetTypeAndSourceTypeArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("sourceType", "sourceType")
                 .build();
@@ -59,7 +59,7 @@ public class PayloadExtractorTest {
     public void shouldReturnExtractedPayloadIfTargetTypeAndTargetIdArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("targetId", "targetId")
                 .build();
@@ -75,7 +75,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionIfTargetTypeIsNotPresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetId", "targetId")
                 .build();
 
@@ -93,7 +93,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionIfTargetTypeIsPresentButSourceIdAndSourceTypeAndTargetIdAreNotPresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .build();
 
@@ -111,7 +111,7 @@ public class PayloadExtractorTest {
     public void shouldReturnExtractedPayloadForBulkOperationIfTargetTypeAndSourceIdsArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("sourceIds", "source1,source2")
                 .build();
@@ -127,7 +127,7 @@ public class PayloadExtractorTest {
     public void shouldReturnExtractedPayloadForBulkOperationIfTargetTypeAndTargetIdsArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("targetIds", "target1,target2")
                 .build();
@@ -143,7 +143,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfBothSourceIdsAndTargetIdsArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("sourceIds", "source1,source2")
                 .add("targetIds", "target1,target2")
@@ -163,7 +163,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfNeitherSourceIdsNorTargetIdsArePresent() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .build();
 
@@ -181,8 +181,8 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfTargetTypeIsJsonObject() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
-                .add("targetType", createObjectBuilder().build())
+        final JsonObject payload = JsonObjects.createObjectBuilder()
+                .add("targetType", JsonObjects.createObjectBuilder().build())
                 .add("sourceIds", "source1,source2")
                 .build();
 
@@ -200,7 +200,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfSourceIdsIsJsonArray() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .add("sourceIds", javax.json.Json.createArrayBuilder().add("source1").add("source2").build())
                 .build();
@@ -219,7 +219,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfTargetIdsIsNull() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
                 .addNull("targetIds")
                 .build();
@@ -238,7 +238,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfTargetTypeIsNumber() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", 123)
                 .add("sourceIds", "source1,source2")
                 .build();
@@ -257,7 +257,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfTargetTypeIsBoolean() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", true)
                 .add("targetIds", "target1,target2")
                 .build();
@@ -276,7 +276,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfTargetTypeIsEmpty() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "")
                 .add("sourceIds", "source1,source2")
                 .build();
@@ -295,7 +295,7 @@ public class PayloadExtractorTest {
     public void shouldThrowExceptionForBulkOperationIfTargetTypeIsBlank() {
 
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
-        final JsonObject payload = createObjectBuilder()
+        final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "   ")
                 .add("targetIds", "target1,target2")
                 .build();
