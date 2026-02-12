@@ -426,14 +426,14 @@ public class IdMapperIT {
         final UUID targetId = randomUUID();
         final String targetType = "CASE ID";
 
-        final String requestPayload1 = createObjectBuilder()
+        final String requestPayload1 = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId1)
                 .add("sourceType", sourceType)
                 .add("targetId", targetId.toString())
                 .add("targetType", targetType)
                 .build().toString();
 
-        final String requestPayload2 = createObjectBuilder()
+        final String requestPayload2 = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId2)
                 .add("sourceType", sourceType)
                 .add("targetId", targetId.toString())
@@ -476,14 +476,14 @@ public class IdMapperIT {
         final String targetType = "CASE ID";
         String targetIds = String.join(",", strTargetId1, strTargetId2);
 
-        final String requestPayload1 = createObjectBuilder()
+        final String requestPayload1 = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId1)
                 .add("sourceType", sourceType)
                 .add("targetId", strTargetId1)
                 .add("targetType", targetType)
                 .build().toString();
 
-        final String requestPayload2 = createObjectBuilder()
+        final String requestPayload2 = JsonObjects.createObjectBuilder()
                 .add("sourceId", sourceId2)
                 .add("sourceType", sourceType)
                 .add("targetId", strTargetId2)
