@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.justice.services.messaging.Envelope.envelopeFrom;
 import static uk.gov.justice.services.messaging.Envelope.metadataBuilder;
 import static uk.gov.justice.services.test.utils.core.matchers.HandlerMatcher.isCustomHandler;
@@ -47,6 +49,7 @@ import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.SystemIdMappi
 import uk.gov.moj.cpp.systemidmapper.service.SystemIdMappingService;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -425,4 +428,98 @@ public class SystemIdMapperApiTest {
                 )))
         ));
     }
+
+    @Test
+    void shouldFindSystemIdMappingsInBulkBySourceIds() {
+        // given
+        final UUID mappingId1 = randomUUID();
+        final UUID targetId1 = randomUUID();
+        final UUID mappingId2 = randomUUID();
+        final UUID targetId2 = randomUUID();
+        final ZonedDateTime createdAt = ZonedDateTime.now();
+
+        final String sourceIds = "sourceA, sourceB";
+        final String targetType = "targetType";
+
+        final JsonEnvelope envelope = envelope()
+                .with(metadataOf(randomUUID(), "systemid.find-mappings-bulk"))
+                .withPayloadOf(sourceIds, "sourceIds")
+                .withPayloadOf(targetType, "targetType")
+                .build();
+
+        final SystemIdMapping m1 = new SystemIdMapping(mappingId1, "sourceA", "sourceType",
+                targetId1, targetType, createdAt);
+        final SystemIdMapping m2 = new SystemIdMapping(mappingId2, "sourceB", "sourceType",
+                targetId2, targetType, createdAt);
+
+        when(systemIdMappingService.findMappingsBySourceIdsAndTargetType(
+                Optional.of(sourceIds), targetType)
+        ).thenReturn(List.of(m1, m2));
+
+        // when
+        final JsonEnvelope result = systemIdMapperApi.findSystemIdMappingsInBulk(envelope);
+
+        // then
+        assertThat(result, jsonEnvelope(
+                metadata().withName("systemid.mapping"),
+                payload().isJson(allOf(
+                       withJsonPath("$.systemIds[0].sourceId", is("sourceA")),
+                       withJsonPath("$.systemIds[1].sourceId", is("sourceB")),
+                       withJsonPath("$.systemIds[0].targetType", is("targetType")),
+                       withJsonPath("$.systemIds[1].targetType", is("targetType"))
+                ))
+        ));
+
+
+        verify(systemIdMappingService).findMappingsBySourceIdsAndTargetType(Optional.of(sourceIds), targetType);
+        verifyNoMoreInteractions(systemIdMappingService);
+    }
+
+    @Test
+    void shouldFindSystemIdMappingsInBulkByTargetIds() {
+        // given
+        final UUID mappingId1 = randomUUID();
+        final UUID mappingId2 = randomUUID();
+        final String sourceId1 = "sourceId1";
+        final String sourceId2 = "sourceId2";
+        String targetId1 = UUID.randomUUID().toString();
+        String targetId2 = UUID.randomUUID().toString();
+        final ZonedDateTime createdAt = ZonedDateTime.now();
+
+        final String targetIds = String.join(",", targetId1, targetId2);
+        final String targetType = "targetType";
+
+        final JsonEnvelope envelope = envelope()
+                .with(metadataOf(randomUUID(), "systemid.find-mappings-bulk"))
+                .withPayloadOf(targetIds, "targetIds")
+                .withPayloadOf(targetType, "targetType")
+                .build();
+
+        final SystemIdMapping m1 = new SystemIdMapping(mappingId1, sourceId1, "sourceType",
+                UUID.fromString(targetId1), targetType, createdAt);
+        final SystemIdMapping m2 = new SystemIdMapping(mappingId2, sourceId2, "sourceType",
+                UUID.fromString(targetId2), targetType, createdAt);
+
+        when(systemIdMappingService.findMappingsByTargetIdsAndTargetType(
+                Optional.of(targetIds), targetType)
+        ).thenReturn(List.of(m1, m2));
+
+        // when
+        final JsonEnvelope result = systemIdMapperApi.findSystemIdMappingsInBulk(envelope);
+
+        // then
+        assertThat(result, jsonEnvelope(
+                metadata().withName("systemid.mapping"),
+                payload().isJson(allOf(
+                        withJsonPath("$.systemIds[0].targetId", is(targetId1)),
+                        withJsonPath("$.systemIds[1].targetId", is(targetId2)),
+                        withJsonPath("$.systemIds[0].targetType", is("targetType")),
+                        withJsonPath("$.systemIds[1].targetType", is("targetType"))
+                ))
+        ));
+
+        verify(systemIdMappingService).findMappingsByTargetIdsAndTargetType(Optional.of(targetIds), targetType);
+        verifyNoMoreInteractions(systemIdMappingService);
+    }
+
 }

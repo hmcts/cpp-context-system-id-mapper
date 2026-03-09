@@ -2,14 +2,15 @@ package uk.gov.moj.cpp.systemidmapper.service;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.UUID.fromString;
 
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.api.SystemIdMappingRepository;
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.MappingResponse;
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.entity.SystemIdMapping;
 import uk.gov.moj.cpp.systemidmapper.persistence.repository.exception.MappingConflictException;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -51,6 +52,34 @@ public class SystemIdMappingService {
 
     public Optional<SystemIdMapping> findMappingBySourceIdAndTargetType(final String sourceId, final String... targetTypes) {
         return systemIdMappingRepository.findBySourceIdAndTargetType(sourceId, targetTypes);
+    }
+
+    public List<SystemIdMapping> findMappingsBySourceIdsAndTargetType(final Optional<String> sourceIds, final String targetType) {
+        if (sourceIds.isEmpty() || sourceIds.get().isBlank()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(sourceIds.get().split(","))
+                .map(String::trim)
+                .filter(id -> !id.isEmpty())
+                .distinct()
+                .map(id -> systemIdMappingRepository.findBySourceIdAndTargetType(id, targetType))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    public List<SystemIdMapping> findMappingsByTargetIdsAndTargetType(final Optional<String> targetIds, final String targetType) {
+        if (targetIds.isEmpty() || targetIds.get().isBlank()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(targetIds.get().split(","))
+                .map(String::trim)
+                .filter(id -> !id.isEmpty())
+                .distinct()
+                .map(id -> systemIdMappingRepository.findSystemIdMapping(fromString(id), targetType))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("squid:S2629")

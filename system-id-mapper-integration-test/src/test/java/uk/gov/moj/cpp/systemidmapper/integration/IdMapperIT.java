@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
 public class IdMapperIT {
 
     private static final String URL = "http://" + getHost() + ":8080/system-id-mapper-api/rest/systemid/mappings/";
+    private static final String BULK_URL = "http://" + getHost() + ":8080/system-id-mapper-api/rest/systemid/mappings/bulk";
 
     private final DatabaseSeeder databaseSeeder = new DatabaseSeeder();
 
@@ -54,6 +55,7 @@ public class IdMapperIT {
     private final JsonObjectToObjectConverter jsonObjectConverter = new JsonObjectToObjectConverter(new ObjectMapperProducer().objectMapper());
 
     private static final String QUERY_MEDIA_TYPE = "application/vnd.systemid.mapping+json";
+    private static final String QUERY_BULK_MEDIA_TYPE = "application/vnd.systemid.mappings+json";
 
     @BeforeEach
     public void cleanTheDatabase() throws Exception {
@@ -414,4 +416,101 @@ public class IdMapperIT {
         assertThat(systemIdMappingList.getSystemIdMappings().get(0).getTargetId().toString(), is(systemIdMapping2.getTargetId().toString()));
         assertThat(systemIdMappingList.getSystemIdMappings().get(0).getIsError(), is(false));
     }
+
+    @Test
+    public void shouldInsertNewMappingBulkForSourceIdsAndTargetType() {
+        final String sourceId1 = "sourceId1";
+        final String sourceId2 = "sourceId2";
+        final String sourceIds = "sourceId1,sourceId2";
+        final String sourceType = "TFL ID";
+        final UUID targetId = randomUUID();
+        final String targetType = "CASE ID";
+
+        final String requestPayload1 = JsonObjects.createObjectBuilder()
+                .add("sourceId", sourceId1)
+                .add("sourceType", sourceType)
+                .add("targetId", targetId.toString())
+                .add("targetType", targetType)
+                .build().toString();
+
+        final String requestPayload2 = JsonObjects.createObjectBuilder()
+                .add("sourceId", sourceId2)
+                .add("sourceType", sourceType)
+                .add("targetId", targetId.toString())
+                .add("targetType", targetType)
+                .build().toString();
+
+        final Response response1 = restClient.postCommand(URL, "application/vnd.systemid.map+json", requestPayload1, headers());
+        final Response response2 = restClient.postCommand(URL, "application/vnd.systemid.map+json", requestPayload2, headers());
+
+        assertThat(response1.getStatus(), is(OK.getStatusCode()));
+        assertThat(response2.getStatus(), is(OK.getStatusCode()));
+
+        // Retrieve mapping
+        final String url = BULK_URL + format("?sourceIds=%s&targetType=%s", sourceIds, targetType);
+        final RequestParams requestParams = requestParams(url , QUERY_BULK_MEDIA_TYPE)
+                .withHeader(HeaderConstants.USER_ID, USER_ID)
+                .build();
+
+        final String responsePayload = poll(requestParams).until(status().is(OK)).getPayload();
+
+        with(responsePayload)
+                .assertThat("$.systemIds[0].sourceId", is(sourceId1))
+                .assertThat("$.systemIds[1].sourceId", is(sourceId2))
+                .assertThat("$.systemIds[0].sourceType", is("TFL ID"))
+                .assertThat("$.systemIds[0].targetType", is("CASE ID"))
+                .assertThat("$.systemIds[1].targetType", is("CASE ID"))
+        ;
+    }
+
+    @Test
+    public void shouldInsertNewMappingBulkForTargetIdsAndTargetType() {
+
+        final String sourceId1 = "sourceId1";
+        final String sourceId2 = "sourceId2";
+        final String sourceType = "TFL ID";
+        final UUID targetId1 = randomUUID();
+        final UUID targetId2 = randomUUID();
+        String strTargetId1 = targetId1.toString();
+        String strTargetId2 = targetId2.toString();
+        final String targetType = "CASE ID";
+        String targetIds = String.join(",", strTargetId1, strTargetId2);
+
+        final String requestPayload1 = JsonObjects.createObjectBuilder()
+                .add("sourceId", sourceId1)
+                .add("sourceType", sourceType)
+                .add("targetId", strTargetId1)
+                .add("targetType", targetType)
+                .build().toString();
+
+        final String requestPayload2 = JsonObjects.createObjectBuilder()
+                .add("sourceId", sourceId2)
+                .add("sourceType", sourceType)
+                .add("targetId", strTargetId2)
+                .add("targetType", targetType)
+                .build().toString();
+
+        final Response response1 = restClient.postCommand(URL, "application/vnd.systemid.map+json", requestPayload1, headers());
+        final Response response2 = restClient.postCommand(URL, "application/vnd.systemid.map+json", requestPayload2, headers());
+
+        assertThat(response1.getStatus(), is(OK.getStatusCode()));
+        assertThat(response2.getStatus(), is(OK.getStatusCode()));
+
+        // Retrieve mapping
+        final String url = BULK_URL + format("?targetIds=%s&targetType=%s", targetIds, targetType);
+        final RequestParams requestParams = requestParams(url , QUERY_BULK_MEDIA_TYPE)
+                .withHeader(HeaderConstants.USER_ID, USER_ID)
+                .build();
+
+        final String responsePayload = poll(requestParams).until(status().is(OK)).getPayload();
+
+        with(responsePayload)
+                .assertThat("$.systemIds[0].targetId", is(strTargetId1))
+                .assertThat("$.systemIds[1].targetId", is(strTargetId2))
+                .assertThat("$.systemIds[0].sourceType", is("TFL ID"))
+                .assertThat("$.systemIds[0].targetType", is("CASE ID"))
+                .assertThat("$.systemIds[1].targetType", is("CASE ID"))
+        ;
+    }
+
 }
