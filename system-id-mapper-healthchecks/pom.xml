@@ -3,7 +3,7 @@
     <parent>
         <artifactId>system-id-mapper-parent</artifactId>
         <groupId>uk.gov.moj.cpp.system-id-mapper</groupId>
-        <version>17.0.25-PEG-2848-SNAPSHOT</version>
+        <version>17.0.26-PEG-2848-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
