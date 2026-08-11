@@ -25,8 +25,8 @@ import uk.gov.moj.cpp.systemidmapper.service.SystemIdMappingService;
 
 import java.util.*;
 
-import javax.inject.Inject;
-import javax.json.JsonObject;
+import jakarta.inject.Inject;
+import jakarta.json.JsonObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

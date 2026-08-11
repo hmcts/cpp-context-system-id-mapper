@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import uk.gov.justice.services.adapter.rest.exception.BadRequestException;
 import uk.gov.justice.services.messaging.JsonEnvelope;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -202,7 +202,7 @@ public class PayloadExtractorTest {
         final JsonEnvelope jsonEnvelope = mock(JsonEnvelope.class);
         final JsonObject payload = JsonObjects.createObjectBuilder()
                 .add("targetType", "targetType")
-                .add("sourceIds", javax.json.Json.createArrayBuilder().add("source1").add("source2").build())
+                .add("sourceIds", jakarta.json.Json.createArrayBuilder().add("source1").add("source2").build())
                 .build();
 
         when(jsonEnvelope.payloadAsJsonObject()).thenReturn(payload);
