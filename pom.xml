@@ -5,12 +5,12 @@
     <parent>
         <groupId>uk.gov.moj.cpp.common</groupId>
         <artifactId>service-parent-pom</artifactId>
-        <version>17.104.0</version>
+        <version>25.104.0-M10</version>
     </parent>
 
     <groupId>uk.gov.moj.cpp.system-id-mapper</groupId>
     <artifactId>system-id-mapper-parent</artifactId>
-    <version>17.104.30-SNAPSHOT</version>
+    <version>25.104.0-M1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>System ID Mapper Service - Parent Module</name>
