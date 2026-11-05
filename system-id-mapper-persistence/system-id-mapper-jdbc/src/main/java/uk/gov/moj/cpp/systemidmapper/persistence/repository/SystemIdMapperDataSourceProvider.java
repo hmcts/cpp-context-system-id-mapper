@@ -2,7 +2,7 @@ package uk.gov.moj.cpp.systemidmapper.persistence.repository;
 
 import uk.gov.justice.services.jdbc.persistence.JdbcDataSourceProvider;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.sql.DataSource;
 
 public class SystemIdMapperDataSourceProvider {
