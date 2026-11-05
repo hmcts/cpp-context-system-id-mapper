@@ -12,7 +12,7 @@ import uk.gov.moj.cpp.systemidmapper.persistence.repository.exception.MappingCon
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 
